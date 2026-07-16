@@ -8,9 +8,12 @@ const {
 const config = require("../config");
 
 
+
 module.exports = {
 
+
     name:"ready",
+
 
 
     async execute(client){
@@ -22,22 +25,54 @@ module.exports = {
 
 
 
-        const channel =
-        client.channels.cache.get(
-            config.panelChannelId
+        console.log(
+            "Searching panel channel..."
         );
+
+
+
+        const channel =
+        await client.channels.fetch(
+            config.panelChannelId
+        )
+        .catch(err => {
+
+
+            console.log(
+                "❌ Channel fetch error:"
+            );
+
+
+            console.log(err);
+
+
+            return null;
+
+
+        });
+
 
 
 
         if(!channel){
 
+
             console.log(
                 "❌ Panel channel not found"
             );
 
+
             return;
 
         }
+
+
+
+
+        console.log(
+            `✅ Channel found: ${channel.name}`
+        );
+
 
 
 
@@ -60,37 +95,83 @@ module.exports = {
 
 
 
+
         const row =
         new ActionRowBuilder()
 
         .addComponents(
 
+
             new ButtonBuilder()
-            .setCustomId("redeem_key")
-            .setLabel("Redeem Key")
+
+            .setCustomId(
+                "redeem_key"
+            )
+
+            .setLabel(
+                "Redeem Key"
+            )
+
             .setEmoji("🔑")
-            .setStyle(ButtonStyle.Primary),
+
+            .setStyle(
+                ButtonStyle.Primary
+            ),
+
 
 
             new ButtonBuilder()
-            .setCustomId("get_script")
-            .setLabel("Get Script")
+
+            .setCustomId(
+                "get_script"
+            )
+
+            .setLabel(
+                "Get Script"
+            )
+
             .setEmoji("📜")
-            .setStyle(ButtonStyle.Success),
+
+            .setStyle(
+                ButtonStyle.Success
+            ),
+
 
 
             new ButtonBuilder()
-            .setCustomId("get_role")
-            .setLabel("Get Role")
+
+            .setCustomId(
+                "get_role"
+            )
+
+            .setLabel(
+                "Get Role"
+            )
+
             .setEmoji("🎖️")
-            .setStyle(ButtonStyle.Secondary),
+
+            .setStyle(
+                ButtonStyle.Secondary
+            ),
+
 
 
             new ButtonBuilder()
-            .setCustomId("reset_hwid")
-            .setLabel("Reset HWID")
+
+            .setCustomId(
+                "reset_hwid"
+            )
+
+            .setLabel(
+                "Reset HWID"
+            )
+
             .setEmoji("🔄")
-            .setStyle(ButtonStyle.Danger)
+
+            .setStyle(
+                ButtonStyle.Danger
+            )
+
 
         );
 
@@ -99,19 +180,40 @@ module.exports = {
 
         await channel.send({
 
-            embeds:[embed],
+            embeds:[
+                embed
+            ],
 
-            components:[row]
+            components:[
+                row
+            ]
+
+        })
+        .then(()=>{
+
+
+            console.log(
+                "✅ Panel sent successfully"
+            );
+
+
+        })
+        .catch(error=>{
+
+
+            console.log(
+                "❌ Send error:"
+            );
+
+
+            console.log(error);
+
 
         });
 
 
 
-        console.log(
-            "✅ Panel sent"
-        );
-
-
     }
+
 
 };
