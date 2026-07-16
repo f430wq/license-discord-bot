@@ -28,74 +28,111 @@ const client = new Client({
 
 client.commands = new Collection();
 
+client.buttons = new Collection();
 
 
 
-// Load commands
+
+// ======================
+// COMMANDS LOADER
+// ======================
+
 
 const commandsPath =
 path.join(__dirname,"commands");
 
 
-for(
-    const file of fs.readdirSync(commandsPath)
-){
-
-    if(file.endsWith(".js")){
+if(fs.existsSync(commandsPath)){
 
 
-        const command =
-        require(`./commands/${file}`);
+    for(
+        const file of fs.readdirSync(commandsPath)
+    ){
 
 
-        client.commands.set(
+        if(file.endsWith(".js")){
 
-            command.data.name,
 
-            command
+            const command =
+            require(`./commands/${file}`);
 
-        );
+
+
+            client.commands.set(
+
+                command.data.name,
+
+                command
+
+            );
+
+
+            console.log(
+                `✅ Command loaded: ${command.data.name}`
+            );
+
+
+        }
 
 
     }
+
 
 }
 
 
 
 
-// Load events
+
+// ======================
+// EVENTS LOADER
+// ======================
+
 
 const eventsPath =
 path.join(__dirname,"events");
 
 
-for(
-    const file of fs.readdirSync(eventsPath)
-){
 
-    if(file.endsWith(".js")){
+if(fs.existsSync(eventsPath)){
 
 
-        const event =
-        require(`./events/${file}`);
+    for(
+        const file of fs.readdirSync(eventsPath)
+    ){
+
+
+        if(file.endsWith(".js")){
+
+
+            const event =
+            require(`./events/${file}`);
 
 
 
-        client.on(
+            client.on(
 
-            event.name,
+                event.name,
 
-            (...args)=>
+                (...args)=>
 
-            event.execute(
-                ...args
-            )
+                event.execute(
+                    ...args
+                )
 
-        );
+            );
+
+
+            console.log(
+                `✅ Event loaded: ${event.name}`
+            );
+
+
+        }
 
 
     }
+
 
 }
 
@@ -103,38 +140,51 @@ for(
 
 
 
-// Buttons
+// ======================
+// BUTTON LOADER
+// ======================
+
 
 const buttonsPath =
 path.join(__dirname,"buttons");
 
 
-client.buttons =
-new Collection();
+
+if(fs.existsSync(buttonsPath)){
+
+
+    for(
+        const file of fs.readdirSync(buttonsPath)
+    ){
+
+
+        if(file.endsWith(".js")){
+
+
+            const button =
+            require(`./buttons/${file}`);
 
 
 
-for(
-    const file of fs.readdirSync(buttonsPath)
-){
+            client.buttons.set(
 
-    if(file.endsWith(".js")){
+                button.id,
 
+                button
 
-        const button =
-        require(`./buttons/${file}`);
+            );
 
 
-        client.buttons.set(
+            console.log(
+                `✅ Button loaded: ${button.id}`
+            );
 
-            button.id,
 
-            button
-
-        );
+        }
 
 
     }
+
 
 }
 
@@ -142,9 +192,14 @@ for(
 
 
 
-// Interactions
+
+// ======================
+// INTERACTIONS
+// ======================
+
 
 client.on(
+
 "interactionCreate",
 
 async interaction => {
@@ -153,13 +208,20 @@ async interaction => {
     try{
 
 
-        if(interaction.isChatInputCommand()){
+        // Slash commands
+
+        if(
+            interaction.isChatInputCommand()
+        ){
 
 
             const command =
             client.commands.get(
+
                 interaction.commandName
+
             );
+
 
 
             if(command){
@@ -175,13 +237,21 @@ async interaction => {
 
 
 
-        if(interaction.isButton()){
+
+        // Buttons
+
+        if(
+            interaction.isButton()
+        ){
 
 
             const button =
             client.buttons.get(
+
                 interaction.customId
+
             );
+
 
 
             if(button){
@@ -197,13 +267,36 @@ async interaction => {
 
 
 
+
     }
+
 
     catch(error){
 
-        console.error(error);
+
+        console.error(
+            error
+        );
+
+
+        if(!interaction.replied){
+
+
+            await interaction.reply({
+
+                content:
+                "❌ Internal error.",
+
+                ephemeral:true
+
+            });
+
+
+        }
+
 
     }
+
 
 
 });
@@ -213,7 +306,13 @@ async interaction => {
 
 
 
+// ======================
+// LOGIN
+// ======================
+
 
 client.login(
+
     process.env.DISCORD_TOKEN
+
 );
