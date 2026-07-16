@@ -48,14 +48,9 @@ module.exports = {
 
 
 
-            const roleId =
-            "1527345778610405496";
-
-
-
             const role =
             interaction.guild.roles.cache.get(
-                roleId
+                config.licenseRoleId
             );
 
 
@@ -78,6 +73,28 @@ module.exports = {
 
 
 
+            if(
+                interaction.member.roles.cache.has(
+                    config.licenseRoleId
+                )
+            ){
+
+
+                return interaction.reply({
+
+                    content:
+                    "✅ You already have the license role.",
+
+                    ephemeral:true
+
+                });
+
+
+            }
+
+
+
+
 
             await interaction.member.roles.add(
                 role
@@ -86,10 +103,11 @@ module.exports = {
 
 
 
+
             await interaction.reply({
 
                 content:
-                "✅ License role added!",
+                "🎖️ License role added successfully!",
 
                 ephemeral:true
 
@@ -98,6 +116,7 @@ module.exports = {
 
 
         }
+
 
         catch(error){
 
@@ -108,7 +127,7 @@ module.exports = {
             await interaction.reply({
 
                 content:
-                "❌ Error while checking license.",
+                "❌ Error while giving role.",
 
                 ephemeral:true
 
@@ -116,6 +135,7 @@ module.exports = {
 
 
         }
+
 
 
     }
