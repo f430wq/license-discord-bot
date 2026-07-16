@@ -10,7 +10,6 @@ const fs = require("fs");
 const path = require("path");
 
 
-
 const client = new Client({
 
     intents:[
@@ -24,19 +23,14 @@ const client = new Client({
 });
 
 
-
-
 client.commands = new Collection();
 
 client.buttons = new Collection();
 
 
-
-
-// ======================
-// COMMANDS LOADER
-// ======================
-
+// =====================
+// COMMANDS
+// =====================
 
 const commandsPath =
 path.join(__dirname,"commands");
@@ -45,9 +39,7 @@ path.join(__dirname,"commands");
 if(fs.existsSync(commandsPath)){
 
 
-    for(
-        const file of fs.readdirSync(commandsPath)
-    ){
+    for(const file of fs.readdirSync(commandsPath)){
 
 
         if(file.endsWith(".js")){
@@ -57,13 +49,9 @@ if(fs.existsSync(commandsPath)){
             require(`./commands/${file}`);
 
 
-
             client.commands.set(
-
                 command.data.name,
-
                 command
-
             );
 
 
@@ -74,32 +62,37 @@ if(fs.existsSync(commandsPath)){
 
         }
 
-
     }
-
 
 }
 
 
 
-
-
-// ======================
-// EVENTS LOADER
-// ======================
-
+// =====================
+// EVENTS
+// =====================
 
 const eventsPath =
 path.join(__dirname,"events");
 
 
+console.log(
+    "EVENT PATH:",
+    eventsPath
+);
+
 
 if(fs.existsSync(eventsPath)){
 
 
-    for(
-        const file of fs.readdirSync(eventsPath)
-    ){
+    console.log(
+        "EVENT FILES:",
+        fs.readdirSync(eventsPath)
+    );
+
+
+
+    for(const file of fs.readdirSync(eventsPath)){
 
 
         if(file.endsWith(".js")){
@@ -110,17 +103,35 @@ if(fs.existsSync(eventsPath)){
 
 
 
-            client.on(
+            if(event.once){
 
-                event.name,
 
-                (...args)=>
+                client.once(
 
-                event.execute(
-                    ...args
-                )
+                    event.name,
 
-            );
+                    (...args)=>
+                    event.execute(...args)
+
+                );
+
+
+            }
+            else{
+
+
+                client.on(
+
+                    event.name,
+
+                    (...args)=>
+                    event.execute(...args)
+
+                );
+
+
+            }
+
 
 
             console.log(
@@ -130,7 +141,6 @@ if(fs.existsSync(eventsPath)){
 
         }
 
-
     }
 
 
@@ -138,24 +148,19 @@ if(fs.existsSync(eventsPath)){
 
 
 
-
-
-// ======================
-// BUTTON LOADER
-// ======================
+// =====================
+// BUTTONS
+// =====================
 
 
 const buttonsPath =
 path.join(__dirname,"buttons");
 
 
-
 if(fs.existsSync(buttonsPath)){
 
 
-    for(
-        const file of fs.readdirSync(buttonsPath)
-    ){
+    for(const file of fs.readdirSync(buttonsPath)){
 
 
         if(file.endsWith(".js")){
@@ -175,6 +180,7 @@ if(fs.existsSync(buttonsPath)){
             );
 
 
+
             console.log(
                 `✅ Button loaded: ${button.id}`
             );
@@ -182,46 +188,35 @@ if(fs.existsSync(buttonsPath)){
 
         }
 
-
     }
-
 
 }
 
 
 
 
-
-
-// ======================
+// =====================
 // INTERACTIONS
-// ======================
+// =====================
 
 
 client.on(
 
 "interactionCreate",
 
-async interaction => {
+async interaction=>{
 
 
     try{
 
 
-        // Slash commands
-
-        if(
-            interaction.isChatInputCommand()
-        ){
+        if(interaction.isChatInputCommand()){
 
 
             const command =
             client.commands.get(
-
                 interaction.commandName
-
             );
-
 
 
             if(command){
@@ -238,20 +233,13 @@ async interaction => {
 
 
 
-        // Buttons
-
-        if(
-            interaction.isButton()
-        ){
+        if(interaction.isButton()){
 
 
             const button =
             client.buttons.get(
-
                 interaction.customId
-
             );
-
 
 
             if(button){
@@ -266,49 +254,19 @@ async interaction => {
         }
 
 
-
-
     }
-
 
     catch(error){
 
-
-        console.error(
-            error
-        );
-
-
-        if(!interaction.replied){
-
-
-            await interaction.reply({
-
-                content:
-                "❌ Internal error.",
-
-                ephemeral:true
-
-            });
-
-
-        }
-
+        console.error(error);
 
     }
-
 
 
 });
 
 
 
-
-
-
-// ======================
-// LOGIN
-// ======================
 
 
 client.login(
