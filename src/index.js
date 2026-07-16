@@ -1,42 +1,47 @@
+require("dotenv").config();
+
 const {
     Client,
-    GatewayIntentBits,
-    Collection
+    Collection,
+    GatewayIntentBits
 } = require("discord.js");
-
-require("dotenv").config();
 
 const fs = require("fs");
 const path = require("path");
 
 
+
 const client = new Client({
 
     intents:[
+
         GatewayIntentBits.Guilds,
+
         GatewayIntentBits.GuildMembers
+
     ]
 
 });
 
 
 
+
 client.commands = new Collection();
-client.buttons = new Collection();
-client.modals = new Collection();
 
 
 
-// Commands
+
+// Load commands
 
 const commandsPath =
 path.join(__dirname,"commands");
 
 
-if(fs.existsSync(commandsPath)){
+for(
+    const file of fs.readdirSync(commandsPath)
+){
 
-    for(const file of fs.readdirSync(commandsPath)
-    .filter(f=>f.endsWith(".js"))){
+    if(file.endsWith(".js")){
 
 
         const command =
@@ -44,13 +49,56 @@ if(fs.existsSync(commandsPath)){
 
 
         client.commands.set(
-            command.name,
+
+            command.data.name,
+
             command
+
         );
+
 
     }
 
 }
+
+
+
+
+// Load events
+
+const eventsPath =
+path.join(__dirname,"events");
+
+
+for(
+    const file of fs.readdirSync(eventsPath)
+){
+
+    if(file.endsWith(".js")){
+
+
+        const event =
+        require(`./events/${file}`);
+
+
+
+        client.on(
+
+            event.name,
+
+            (...args)=>
+
+            event.execute(
+                ...args
+            )
+
+        );
+
+
+    }
+
+}
+
 
 
 
@@ -61,11 +109,16 @@ const buttonsPath =
 path.join(__dirname,"buttons");
 
 
-if(fs.existsSync(buttonsPath)){
+client.buttons =
+new Collection();
 
 
-    for(const file of fs.readdirSync(buttonsPath)
-    .filter(f=>f.endsWith(".js"))){
+
+for(
+    const file of fs.readdirSync(buttonsPath)
+){
+
+    if(file.endsWith(".js")){
 
 
         const button =
@@ -73,62 +126,17 @@ if(fs.existsSync(buttonsPath)){
 
 
         client.buttons.set(
+
             button.id,
+
             button
+
         );
 
 
     }
 
 }
-
-
-
-
-
-// Modals
-
-const modalsPath =
-path.join(__dirname,"modals");
-
-
-if(fs.existsSync(modalsPath)){
-
-
-    for(const file of fs.readdirSync(modalsPath)
-    .filter(f=>f.endsWith(".js"))){
-
-
-        const modal =
-        require(`./modals/${file}`);
-
-
-        client.modals.set(
-            modal.id,
-            modal
-        );
-
-
-    }
-
-}
-
-
-
-
-// Events
-
-client.once(
-"ready",
-async ()=>{
-
-
-    console.log(
-        `✅ ${client.user.tag} online`
-    );
-
-
-});
 
 
 
@@ -138,10 +146,11 @@ async ()=>{
 
 client.on(
 "interactionCreate",
-async interaction=>{
+
+async interaction => {
 
 
-    try {
+    try{
 
 
         if(interaction.isChatInputCommand()){
@@ -161,8 +170,8 @@ async interaction=>{
 
             }
 
-        }
 
+        }
 
 
 
@@ -183,27 +192,6 @@ async interaction=>{
 
             }
 
-        }
-
-
-
-
-        if(interaction.isModalSubmit()){
-
-
-            const modal =
-            client.modals.get(
-                interaction.customId
-            );
-
-
-            if(modal){
-
-                await modal.execute(
-                    interaction
-                );
-
-            }
 
         }
 
@@ -219,6 +207,9 @@ async interaction=>{
 
 
 });
+
+
+
 
 
 
