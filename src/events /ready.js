@@ -10,9 +10,7 @@ const config = require("../config");
 
 module.exports = {
 
-
     name:"ready",
-
 
 
     async execute(client){
@@ -57,14 +55,7 @@ module.exports = {
 
         .setColor(
             config.panel.color
-        )
-
-        .setFooter({
-
-            text:"License System"
-
-        });
-
+        );
 
 
 
@@ -74,85 +65,43 @@ module.exports = {
 
         .addComponents(
 
-
             new ButtonBuilder()
-
-            .setCustomId(
-                config.buttons.redeem
-            )
-
+            .setCustomId("redeem_key")
             .setLabel("Redeem Key")
-
             .setEmoji("🔑")
-
-            .setStyle(
-                ButtonStyle.Primary
-            ),
-
+            .setStyle(ButtonStyle.Primary),
 
 
             new ButtonBuilder()
-
-            .setCustomId(
-                config.buttons.script
-            )
-
+            .setCustomId("get_script")
             .setLabel("Get Script")
-
             .setEmoji("📜")
-
-            .setStyle(
-                ButtonStyle.Success
-            ),
-
+            .setStyle(ButtonStyle.Success),
 
 
             new ButtonBuilder()
-
-            .setCustomId(
-                config.buttons.role
-            )
-
+            .setCustomId("get_role")
             .setLabel("Get Role")
-
             .setEmoji("🎖️")
-
-            .setStyle(
-                ButtonStyle.Secondary
-            ),
-
+            .setStyle(ButtonStyle.Secondary),
 
 
             new ButtonBuilder()
-
-            .setCustomId(
-                config.buttons.reset
-            )
-
+            .setCustomId("reset_hwid")
             .setLabel("Reset HWID")
-
             .setEmoji("🔄")
-
-            .setStyle(
-                ButtonStyle.Danger
-            )
-
+            .setStyle(ButtonStyle.Danger)
 
         );
 
 
 
 
-
         await channel.send({
 
-            embeds:[
-                embed
-            ],
+            embeds:[embed],
 
-            components:[
-                row
-            ]
+            components:[row]
 
         });
 
@@ -164,6 +113,5 @@ module.exports = {
 
 
     }
-
 
 };
