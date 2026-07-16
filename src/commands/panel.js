@@ -1,4 +1,5 @@
 const {
+    SlashCommandBuilder,
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
@@ -10,10 +11,19 @@ const config = require("../config");
 
 module.exports = {
 
-    name: "panel",
+
+    data:
+
+    new SlashCommandBuilder()
+
+    .setName("panel")
+
+    .setDescription("Send the license panel"),
 
 
-    async execute(interaction) {
+
+
+    async execute(interaction){
 
 
         const embed = new EmbedBuilder()
@@ -31,67 +41,94 @@ module.exports = {
             )
 
             .setFooter({
+
                 text:"License System"
+
             });
 
 
 
-        const buttons =
-            new ActionRowBuilder()
-            .addComponents(
 
-                new ButtonBuilder()
-                    .setCustomId(
-                        config.buttons.redeem
-                    )
-                    .setLabel(
-                        "Redeem Key"
-                    )
-                    .setEmoji("🔑")
-                    .setStyle(
-                        ButtonStyle.Primary
-                    ),
+        const row =
+        new ActionRowBuilder()
+
+        .addComponents(
 
 
-                new ButtonBuilder()
-                    .setCustomId(
-                        config.buttons.script
-                    )
-                    .setLabel(
-                        "Get Script"
-                    )
-                    .setEmoji("📜")
-                    .setStyle(
-                        ButtonStyle.Success
-                    ),
+            new ButtonBuilder()
+
+            .setCustomId(
+                config.buttons.redeem
+            )
+
+            .setLabel(
+                "Redeem Key"
+            )
+
+            .setEmoji("🔑")
+
+            .setStyle(
+                ButtonStyle.Primary
+            ),
 
 
-                new ButtonBuilder()
-                    .setCustomId(
-                        config.buttons.role
-                    )
-                    .setLabel(
-                        "Get Role"
-                    )
-                    .setEmoji("🎖️")
-                    .setStyle(
-                        ButtonStyle.Secondary
-                    ),
+
+            new ButtonBuilder()
+
+            .setCustomId(
+                config.buttons.script
+            )
+
+            .setLabel(
+                "Get Script"
+            )
+
+            .setEmoji("📜")
+
+            .setStyle(
+                ButtonStyle.Success
+            ),
 
 
-                new ButtonBuilder()
-                    .setCustomId(
-                        config.buttons.reset
-                    )
-                    .setLabel(
-                        "Reset HWID"
-                    )
-                    .setEmoji("🔄")
-                    .setStyle(
-                        ButtonStyle.Danger
-                    )
 
-            );
+            new ButtonBuilder()
+
+            .setCustomId(
+                config.buttons.role
+            )
+
+            .setLabel(
+                "Get Role"
+            )
+
+            .setEmoji("🎖️")
+
+            .setStyle(
+                ButtonStyle.Secondary
+            ),
+
+
+
+            new ButtonBuilder()
+
+            .setCustomId(
+                config.buttons.reset
+            )
+
+            .setLabel(
+                "Reset HWID"
+            )
+
+            .setEmoji("🔄")
+
+            .setStyle(
+                ButtonStyle.Danger
+            )
+
+
+        );
+
+
 
 
 
@@ -102,12 +139,13 @@ module.exports = {
             ],
 
             components:[
-                buttons
+                row
             ]
 
         });
 
 
     }
+
 
 };
