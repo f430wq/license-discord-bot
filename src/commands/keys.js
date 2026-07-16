@@ -1,8 +1,10 @@
-const axios = require("axios");
-
 const {
+    SlashCommandBuilder,
     EmbedBuilder
 } = require("discord.js");
+
+
+const axios = require("axios");
 
 const config = require("../config");
 const checkAdmin = require("../utils/checkAdmin");
@@ -12,7 +14,15 @@ const checkAdmin = require("../utils/checkAdmin");
 module.exports = {
 
 
-    name:"keys",
+    data:
+
+    new SlashCommandBuilder()
+
+    .setName("keys")
+
+    .setDescription("List licenses"),
+
+
 
 
 
@@ -24,14 +34,14 @@ module.exports = {
 
             return interaction.reply({
 
-                content:
-                "❌ You don't have permission.",
+                content:"❌ No permission.",
 
                 ephemeral:true
 
             });
 
         }
+
 
 
 
@@ -60,31 +70,13 @@ module.exports = {
 
 
 
-            if(!response.data.success){
-
-
-                return interaction.reply({
-
-                    content:
-                    "❌ Failed to fetch licenses.",
-
-                    ephemeral:true
-
-                });
-
-            }
-
-
-
-
-
             const licenses =
             response.data.licenses;
 
 
 
 
-            if(licenses.length === 0){
+            if(!licenses.length){
 
 
                 return interaction.reply({
@@ -96,33 +88,33 @@ module.exports = {
 
                 });
 
-
             }
 
 
 
 
 
-            let description = "";
+            let text = "";
 
 
 
-            for(const license of licenses.slice(0,10)){
+            for(
+                const license of licenses.slice(0,10)
+            ){
 
 
-                description +=
+                text +=
 
-                `🔑 \`${license.key}\`\n` +
+                `🔑 ${license.key}\n`+
 
-                `📌 Status: **${license.status}**\n` +
+                `📌 ${license.status}\n`+
 
-                `🎟️ Type: **${license.type}**\n` +
+                `🎟️ ${license.type}\n`+
 
-                `👤 Discord: ${license.discord_id || "None"}\n\n`;
+                `👤 ${license.discord_id || "None"}\n\n`;
 
 
             }
-
 
 
 
@@ -131,24 +123,16 @@ module.exports = {
             new EmbedBuilder()
 
             .setTitle(
-                "🔐 License List"
+                "🔐 Licenses"
             )
 
             .setDescription(
-                description
+                text
             )
 
             .setColor(
                 0x5865F2
-            )
-
-            .setFooter({
-
-                text:
-                `Showing ${Math.min(licenses.length,10)} licenses`
-
-            });
-
+            );
 
 
 
@@ -167,11 +151,10 @@ module.exports = {
 
         }
 
-
         catch(error){
 
 
-            console.error(error);
+            console.log(error);
 
 
             await interaction.reply({
@@ -185,7 +168,6 @@ module.exports = {
 
 
         }
-
 
 
     }
