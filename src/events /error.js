@@ -6,10 +6,9 @@ module.exports = {
     execute(error){
 
         console.error(
-            "Discord Client Error:"
+            "Discord Error:",
+            error
         );
-
-        console.error(error);
 
     }
 
