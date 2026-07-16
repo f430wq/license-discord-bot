@@ -1,12 +1,29 @@
+const config = require("../config");
+
+
 module.exports = function checkAdmin(interaction) {
 
 
-    const adminRole =
-    "1526978281725890581";
+    if(!interaction.guild){
+
+        return false;
+
+    }
+
+
+
+    if(!interaction.member){
+
+        return false;
+
+    }
+
 
 
     return interaction.member.roles.cache.has(
-        adminRole
+
+        config.adminRoleId
+
     );
 
 
