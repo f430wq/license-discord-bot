@@ -5,16 +5,17 @@ const config = require("../config");
 
 module.exports = {
 
-    id: "reset_hwid",
+    id:"reset_hwid",
 
 
-    async execute(interaction) {
+
+    async execute(interaction){
 
 
-        try {
+        try{
 
 
-            // Trouver la licence de l'utilisateur
+            // Trouver la licence utilisateur
 
             const licenseResponse =
             await axios.post(
@@ -22,8 +23,10 @@ module.exports = {
                 `${config.apiUrl}/licenses/user`,
 
                 {
+
                     discord_id:
                     interaction.user.id
+
                 }
 
             );
@@ -47,21 +50,47 @@ module.exports = {
 
 
 
-            const key =
-            licenseResponse.data.license.key;
+
+
+            const license =
+            licenseResponse.data.license;
+
+
+
+
+            if(
+                license.status === "revoked"
+            ){
+
+
+                return interaction.reply({
+
+                    content:
+                    "❌ Your license is revoked.",
+
+                    ephemeral:true
+
+                });
+
+
+            }
+
 
 
 
 
             // Reset HWID
 
-            const reset =
+            const response =
             await axios.post(
 
                 `${config.apiUrl}/hwid/reset`,
 
                 {
-                    key:key
+
+                    key:
+                    license.key
+
                 }
 
             );
@@ -69,13 +98,14 @@ module.exports = {
 
 
 
-            if(!reset.data.success){
+
+            if(!response.data.success){
 
 
                 return interaction.reply({
 
                     content:
-                    `❌ ${reset.data.message}`,
+                    `❌ ${response.data.message || "Reset failed."}`,
 
                     ephemeral:true
 
@@ -91,11 +121,12 @@ module.exports = {
             await interaction.reply({
 
                 content:
-                "✅ Your HWID has been reset.",
+                "✅ Your HWID has been reset successfully.",
 
                 ephemeral:true
 
             });
+
 
 
 
@@ -108,10 +139,11 @@ module.exports = {
             console.error(error);
 
 
+
             await interaction.reply({
 
                 content:
-                "❌ API error.",
+                "❌ API error while resetting HWID.",
 
                 ephemeral:true
 
@@ -123,5 +155,6 @@ module.exports = {
 
 
     }
+
 
 };
