@@ -4,11 +4,6 @@ require("dotenv").config();
 module.exports = {
 
 
-    // =====================
-    // Discord Roles
-    // =====================
-
-
     adminRoleId:
     process.env.ADMIN_ROLE_ID,
 
@@ -17,12 +12,9 @@ module.exports = {
     process.env.LICENSE_ROLE_ID,
 
 
+    panelChannelId:
+    process.env.PANEL_CHANNEL_ID,
 
-
-
-    // =====================
-    // License API
-    // =====================
 
 
     apiUrl:
@@ -34,37 +26,19 @@ module.exports = {
 
 
 
-
-
-    // =====================
-    // Panel
-    // =====================
-
-
     panel: {
-
 
         title:
         "🔐 License Panel",
 
-
         description:
         "Use the buttons below to manage your license.",
-
 
         color:
         0x5865F2
 
-
     },
 
-
-
-
-
-    // =====================
-    // Buttons IDs
-    // =====================
 
 
     buttons:{
