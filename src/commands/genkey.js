@@ -1,14 +1,24 @@
+const {
+    SlashCommandBuilder
+} = require("discord.js");
+
 const axios = require("axios");
 
 const config = require("../config");
 const checkAdmin = require("../utils/checkAdmin");
 
 
-
 module.exports = {
 
 
-    name:"genkey",
+    data:
+
+    new SlashCommandBuilder()
+
+    .setName("genkey")
+
+    .setDescription("Generate a license key"),
+
 
 
 
@@ -20,13 +30,11 @@ module.exports = {
 
             return interaction.reply({
 
-                content:
-                "❌ You don't have permission.",
+                content:"❌ No permission.",
 
                 ephemeral:true
 
             });
-
 
         }
 
@@ -64,12 +72,11 @@ module.exports = {
 
 
 
-
             await interaction.reply({
 
                 content:
 
-                `✅ License generated:\n\`\`\`${response.data.license.key}\`\`\``,
+                `✅ Generated:\n\`${response.data.license.key}\``,
 
                 ephemeral:true
 
@@ -78,18 +85,16 @@ module.exports = {
 
 
         }
-
 
         catch(error){
 
 
-            console.error(error);
+            console.log(error);
 
 
             await interaction.reply({
 
-                content:
-                "❌ API error.",
+                content:"❌ API Error",
 
                 ephemeral:true
 
@@ -97,7 +102,6 @@ module.exports = {
 
 
         }
-
 
 
     }
