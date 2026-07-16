@@ -13,7 +13,7 @@ const path = require("path");
 
 const client = new Client({
 
-    intents: [
+    intents:[
 
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers
@@ -24,32 +24,28 @@ const client = new Client({
 
 
 
-// Collections
-
 client.commands = new Collection();
-
 client.buttons = new Collection();
-
 client.modals = new Collection();
 
 
 
 
-// Charger les commandes
+// Commands
 
-const commandsPath = path.join(__dirname, "commands");
+const commandsPath =
+path.join(__dirname,"commands");
+
 
 if(fs.existsSync(commandsPath)){
 
-    const commandFiles = fs.readdirSync(commandsPath)
-        .filter(file => file.endsWith(".js"));
+
+    for(const file of fs.readdirSync(commandsPath)
+        .filter(f=>f.endsWith(".js"))){
 
 
-    for(const file of commandFiles){
-
-        const command = require(
-            `./commands/${file}`
-        );
+        const command =
+        require(`./commands/${file}`);
 
 
         client.commands.set(
@@ -57,6 +53,7 @@ if(fs.existsSync(commandsPath)){
             command
         );
 
+
     }
 
 }
@@ -64,65 +61,27 @@ if(fs.existsSync(commandsPath)){
 
 
 
-// Charger les boutons
+// Events
 
-const buttonsPath = path.join(__dirname, "buttons");
-
-
-if(fs.existsSync(buttonsPath)){
+const eventsPath =
+path.join(__dirname,"events");
 
 
-    const buttonFiles = fs.readdirSync(buttonsPath)
-        .filter(file => file.endsWith(".js"));
+if(fs.existsSync(eventsPath)){
 
 
-
-    for(const file of buttonFiles){
-
-
-        const button = require(
-            `./buttons/${file}`
-        );
+    for(const file of fs.readdirSync(eventsPath)
+        .filter(f=>f.endsWith(".js"))){
 
 
-        client.buttons.set(
-            button.id,
-            button
-        );
+        const event =
+        require(`./events/${file}`);
 
 
-    }
-
-
-}
-
-
-
-
-// Charger les modals
-
-const modalsPath = path.join(__dirname, "modals");
-
-
-if(fs.existsSync(modalsPath)){
-
-
-    const modalFiles = fs.readdirSync(modalsPath)
-        .filter(file => file.endsWith(".js"));
-
-
-
-    for(const file of modalFiles){
-
-
-        const modal = require(
-            `./modals/${file}`
-        );
-
-
-        client.modals.set(
-            modal.id,
-            modal
+        client.once(
+            event.name,
+            (...args)=>
+            event.execute(...args, client)
         );
 
 
@@ -135,113 +94,31 @@ if(fs.existsSync(modalsPath)){
 
 
 
-// Interaction Handler
+// Interaction
 
-client.on("interactionCreate", async interaction => {
-
-
-    try {
-
-
-        // Slash commands
-
-        if(interaction.isChatInputCommand()){
+client.on(
+"interactionCreate",
+async interaction=>{
 
 
-            const command =
-                client.commands.get(
-                    interaction.commandName
-                );
+    if(interaction.isChatInputCommand()){
 
 
-            if(command){
-
-                await command.execute(interaction);
-
-            }
-
-
-        }
+        const command =
+        client.commands.get(
+            interaction.commandName
+        );
 
 
+        if(command){
 
-
-        // Buttons
-
-        if(interaction.isButton()){
-
-
-            const button =
-                client.buttons.get(
-                    interaction.customId
-                );
-
-
-            if(button){
-
-                await button.execute(interaction);
-
-            }
-
-
-        }
-
-
-
-
-        // Modals
-
-        if(interaction.isModalSubmit()){
-
-
-            const modal =
-                client.modals.get(
-                    interaction.customId
-                );
-
-
-            if(modal){
-
-                await modal.execute(interaction);
-
-            }
-
-
-        }
-
-
-
-    } catch(error){
-
-        console.error(error);
-
-
-        if(!interaction.replied){
-
-            await interaction.reply({
-
-                content:"❌ An error occurred.",
-                ephemeral:true
-
-            });
+            await command.execute(
+                interaction
+            );
 
         }
 
     }
-
-
-});
-
-
-
-
-
-client.once("ready",()=>{
-
-
-    console.log(
-        `✅ Logged as ${client.user.tag}`
-    );
 
 
 });
