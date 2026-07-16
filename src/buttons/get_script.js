@@ -8,15 +8,16 @@ module.exports = {
     id: "get_script",
 
 
+
     async execute(interaction) {
 
 
         try {
 
 
-            // Vérifier si l'utilisateur possède une licence
+            // Vérifier la licence utilisateur
 
-            const check =
+            const licenseResponse =
             await axios.post(
 
                 `${config.apiUrl}/licenses/user`,
@@ -32,13 +33,13 @@ module.exports = {
 
 
 
-            if(!check.data.success){
+            if(!licenseResponse.data.success){
 
 
                 return interaction.reply({
 
                     content:
-                    "❌ You don't have a valid license.",
+                    "❌ You don't have a license.",
 
                     ephemeral:true
 
@@ -50,9 +51,36 @@ module.exports = {
 
 
 
-            // Demander le script à l'API
+            const license =
+            licenseResponse.data.license;
 
-            const script =
+
+
+
+            if(
+                license.status === "revoked"
+            ){
+
+
+                return interaction.reply({
+
+                    content:
+                    "❌ Your license has been revoked.",
+
+                    ephemeral:true
+
+                });
+
+
+            }
+
+
+
+
+
+            // Récupérer le script
+
+            const scriptResponse =
             await axios.post(
 
                 `${config.apiUrl}/script/get`,
@@ -60,7 +88,7 @@ module.exports = {
                 {
 
                     key:
-                    check.data.license.key
+                    license.key
 
                 }
 
@@ -69,13 +97,14 @@ module.exports = {
 
 
 
-            if(!script.data.success){
+
+            if(!scriptResponse.data.success){
 
 
                 return interaction.reply({
 
                     content:
-                    `❌ ${script.data.message}`,
+                    "❌ Script unavailable.",
 
                     ephemeral:true
 
@@ -87,17 +116,63 @@ module.exports = {
 
 
 
-            await interaction.reply({
 
-                content:
+            const script =
+            scriptResponse.data.script;
 
-                "✅ Your script:\n\n```lua\n" +
-                script.data.script +
-                "\n```",
 
-                ephemeral:true
 
-            });
+
+            // Envoyer en DM
+
+            try {
+
+
+                await interaction.user.send({
+
+                    content:
+
+                    "📜 **Your Roblox Script**\n\n" +
+
+                    "```lua\n" +
+
+                    script +
+
+                    "\n```"
+
+                });
+
+
+
+                await interaction.reply({
+
+                    content:
+                    "✅ Script sent in your DM.",
+
+                    ephemeral:true
+
+                });
+
+
+
+            }
+
+            catch{
+
+
+                await interaction.reply({
+
+                    content:
+                    "❌ I can't DM you. Enable private messages.",
+
+                    ephemeral:true
+
+                });
+
+
+            }
+
+
 
 
 
@@ -108,6 +183,7 @@ module.exports = {
 
 
             console.error(error);
+
 
 
             await interaction.reply({
@@ -123,7 +199,7 @@ module.exports = {
         }
 
 
-
     }
+
 
 };
