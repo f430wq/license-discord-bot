@@ -1,13 +1,22 @@
 require("dotenv").config();
 
+
 const {
     Client,
     Collection,
-    GatewayIntentBits
+    GatewayIntentBits,
+    EmbedBuilder,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle
 } = require("discord.js");
+
 
 const fs = require("fs");
 const path = require("path");
+
+const config = require("./config");
+
 
 
 const client = new Client({
@@ -23,17 +32,21 @@ const client = new Client({
 });
 
 
+
 client.commands = new Collection();
 
 client.buttons = new Collection();
 
 
-// =====================
-// COMMANDS
-// =====================
+
+// ======================
+// LOAD COMMANDS
+// ======================
+
 
 const commandsPath =
 path.join(__dirname,"commands");
+
 
 
 if(fs.existsSync(commandsPath)){
@@ -49,10 +62,15 @@ if(fs.existsSync(commandsPath)){
             require(`./commands/${file}`);
 
 
+
             client.commands.set(
+
                 command.data.name,
+
                 command
+
             );
+
 
 
             console.log(
@@ -62,84 +80,6 @@ if(fs.existsSync(commandsPath)){
 
         }
 
-    }
-
-}
-
-
-
-// =====================
-// EVENTS
-// =====================
-
-const eventsPath =
-path.join(__dirname,"events");
-
-
-console.log(
-    "EVENT PATH:",
-    eventsPath
-);
-
-
-if(fs.existsSync(eventsPath)){
-
-
-    console.log(
-        "EVENT FILES:",
-        fs.readdirSync(eventsPath)
-    );
-
-
-
-    for(const file of fs.readdirSync(eventsPath)){
-
-
-        if(file.endsWith(".js")){
-
-
-            const event =
-            require(`./events/${file}`);
-
-
-
-            if(event.once){
-
-
-                client.once(
-
-                    event.name,
-
-                    (...args)=>
-                    event.execute(...args)
-
-                );
-
-
-            }
-            else{
-
-
-                client.on(
-
-                    event.name,
-
-                    (...args)=>
-                    event.execute(...args)
-
-                );
-
-
-            }
-
-
-
-            console.log(
-                `✅ Event loaded: ${event.name}`
-            );
-
-
-        }
 
     }
 
@@ -148,13 +88,15 @@ if(fs.existsSync(eventsPath)){
 
 
 
-// =====================
-// BUTTONS
-// =====================
+
+// ======================
+// LOAD BUTTONS
+// ======================
 
 
 const buttonsPath =
 path.join(__dirname,"buttons");
+
 
 
 if(fs.existsSync(buttonsPath)){
@@ -188,16 +130,229 @@ if(fs.existsSync(buttonsPath)){
 
         }
 
+
     }
+
 
 }
 
 
 
 
-// =====================
+
+
+// ======================
+// BOT READY
+// ======================
+
+
+client.once("ready", async ()=>{
+
+
+    console.log(
+        `✅ Logged as ${client.user.tag}`
+    );
+
+
+
+    const channel =
+    await client.channels.fetch(
+
+        config.panelChannelId
+
+    )
+    .catch(error=>{
+
+
+        console.log(
+            "❌ Channel fetch error:",
+            error
+        );
+
+
+        return null;
+
+
+    });
+
+
+
+
+    if(!channel){
+
+
+        console.log(
+            "❌ Panel channel not found"
+        );
+
+
+        return;
+
+
+    }
+
+
+
+
+
+    const embed =
+    new EmbedBuilder()
+
+    .setTitle(
+        "🔐 License Panel"
+    )
+
+    .setDescription(
+
+        "Choose an option below."
+
+    )
+
+    .setColor(
+        0x5865F2
+    );
+
+
+
+
+
+    const row =
+    new ActionRowBuilder()
+
+    .addComponents(
+
+
+        new ButtonBuilder()
+
+        .setCustomId(
+            "redeem_key"
+        )
+
+        .setLabel(
+            "Redeem Key"
+        )
+
+        .setEmoji(
+            "🔑"
+        )
+
+        .setStyle(
+            ButtonStyle.Primary
+        ),
+
+
+
+        new ButtonBuilder()
+
+        .setCustomId(
+            "get_script"
+        )
+
+        .setLabel(
+            "Get Script"
+        )
+
+        .setEmoji(
+            "📜"
+        )
+
+        .setStyle(
+            ButtonStyle.Success
+        ),
+
+
+
+        new ButtonBuilder()
+
+        .setCustomId(
+            "get_role"
+        )
+
+        .setLabel(
+            "Get Role"
+        )
+
+        .setEmoji(
+            "🎖️"
+        )
+
+        .setStyle(
+            ButtonStyle.Secondary
+        ),
+
+
+
+        new ButtonBuilder()
+
+        .setCustomId(
+            "reset_hwid"
+        )
+
+        .setLabel(
+            "Reset HWID"
+        )
+
+        .setEmoji(
+            "🔄"
+        )
+
+        .setStyle(
+            ButtonStyle.Danger
+        )
+
+
+    );
+
+
+
+
+    await channel.send({
+
+        embeds:[
+
+            embed
+
+        ],
+
+        components:[
+
+            row
+
+        ]
+
+    })
+    .then(()=>{
+
+
+        console.log(
+            "✅ Panel sent"
+        );
+
+
+    })
+    .catch(error=>{
+
+
+        console.log(
+            "❌ Panel send error:",
+            error
+        );
+
+
+    });
+
+
+
+});
+
+
+
+
+
+
+// ======================
 // INTERACTIONS
-// =====================
+// ======================
 
 
 client.on(
@@ -215,20 +370,26 @@ async interaction=>{
 
             const command =
             client.commands.get(
+
                 interaction.commandName
+
             );
 
 
+
             if(command){
+
 
                 await command.execute(
                     interaction
                 );
 
+
             }
 
 
         }
+
 
 
 
@@ -238,15 +399,20 @@ async interaction=>{
 
             const button =
             client.buttons.get(
+
                 interaction.customId
+
             );
+
 
 
             if(button){
 
+
                 await button.execute(
                     interaction
                 );
+
 
             }
 
@@ -254,11 +420,31 @@ async interaction=>{
         }
 
 
+
     }
 
     catch(error){
 
+
         console.error(error);
+
+
+
+        if(!interaction.replied){
+
+
+            await interaction.reply({
+
+                content:
+                "❌ Error",
+
+                ephemeral:true
+
+            });
+
+
+        }
+
 
     }
 
@@ -267,6 +453,12 @@ async interaction=>{
 
 
 
+
+
+
+// ======================
+// LOGIN
+// ======================
 
 
 client.login(
