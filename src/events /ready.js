@@ -1,9 +1,13 @@
+console.log("READY FILE LOADED");
+
+
 const {
     EmbedBuilder,
     ActionRowBuilder,
     ButtonBuilder,
     ButtonStyle
 } = require("discord.js");
+
 
 const config = require("../config");
 
@@ -13,6 +17,8 @@ module.exports = {
 
 
     name:"ready",
+
+    once:true,
 
 
 
@@ -25,25 +31,19 @@ module.exports = {
 
 
 
-        console.log(
-            "Searching panel channel..."
-        );
-
-
-
         const channel =
+
         await client.channels.fetch(
+
             config.panelChannelId
-        )
-        .catch(err => {
+
+        ).catch(error=>{
 
 
             console.log(
-                "❌ Channel fetch error:"
+                "Channel error:",
+                error
             );
-
-
-            console.log(err);
 
 
             return null;
@@ -56,22 +56,13 @@ module.exports = {
 
         if(!channel){
 
-
             console.log(
                 "❌ Panel channel not found"
             );
 
-
             return;
 
         }
-
-
-
-
-        console.log(
-            `✅ Channel found: ${channel.name}`
-        );
 
 
 
@@ -81,15 +72,17 @@ module.exports = {
         new EmbedBuilder()
 
         .setTitle(
-            config.panel.title
+            "🔐 License Panel"
         )
 
         .setDescription(
-            config.panel.description
+
+            "Use the buttons below."
+
         )
 
         .setColor(
-            config.panel.color
+            0x5865F2
         );
 
 
@@ -188,29 +181,13 @@ module.exports = {
                 row
             ]
 
-        })
-        .then(()=>{
-
-
-            console.log(
-                "✅ Panel sent successfully"
-            );
-
-
-        })
-        .catch(error=>{
-
-
-            console.log(
-                "❌ Send error:"
-            );
-
-
-            console.log(error);
-
-
         });
 
+
+
+        console.log(
+            "✅ Panel sent"
+        );
 
 
     }
