@@ -10,14 +10,11 @@ const fs = require("fs");
 const path = require("path");
 
 
-
 const client = new Client({
 
     intents:[
-
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers
-
     ]
 
 });
@@ -30,7 +27,6 @@ client.modals = new Collection();
 
 
 
-
 // Commands
 
 const commandsPath =
@@ -39,9 +35,8 @@ path.join(__dirname,"commands");
 
 if(fs.existsSync(commandsPath)){
 
-
     for(const file of fs.readdirSync(commandsPath)
-        .filter(f=>f.endsWith(".js"))){
+    .filter(f=>f.endsWith(".js"))){
 
 
         const command =
@@ -51,6 +46,66 @@ if(fs.existsSync(commandsPath)){
         client.commands.set(
             command.name,
             command
+        );
+
+    }
+
+}
+
+
+
+
+// Buttons
+
+const buttonsPath =
+path.join(__dirname,"buttons");
+
+
+if(fs.existsSync(buttonsPath)){
+
+
+    for(const file of fs.readdirSync(buttonsPath)
+    .filter(f=>f.endsWith(".js"))){
+
+
+        const button =
+        require(`./buttons/${file}`);
+
+
+        client.buttons.set(
+            button.id,
+            button
+        );
+
+
+    }
+
+}
+
+
+
+
+
+// Modals
+
+const modalsPath =
+path.join(__dirname,"modals");
+
+
+if(fs.existsSync(modalsPath)){
+
+
+    for(const file of fs.readdirSync(modalsPath)
+    .filter(f=>f.endsWith(".js"))){
+
+
+        const modal =
+        require(`./modals/${file}`);
+
+
+        client.modals.set(
+            modal.id,
+            modal
         );
 
 
@@ -63,66 +118,107 @@ if(fs.existsSync(commandsPath)){
 
 // Events
 
-const eventsPath =
-path.join(__dirname,"events");
+client.once(
+"ready",
+async ()=>{
 
 
-if(fs.existsSync(eventsPath)){
+    console.log(
+        `✅ ${client.user.tag} online`
+    );
 
 
-    for(const file of fs.readdirSync(eventsPath)
-        .filter(f=>f.endsWith(".js"))){
-
-
-        const event =
-        require(`./events/${file}`);
-
-
-        client.once(
-            event.name,
-            (...args)=>
-            event.execute(...args, client)
-        );
-
-
-    }
-
-
-}
+});
 
 
 
 
 
-// Interaction
+// Interactions
 
 client.on(
 "interactionCreate",
 async interaction=>{
 
 
-    if(interaction.isChatInputCommand()){
+    try {
 
 
-        const command =
-        client.commands.get(
-            interaction.commandName
-        );
+        if(interaction.isChatInputCommand()){
 
 
-        if(command){
-
-            await command.execute(
-                interaction
+            const command =
+            client.commands.get(
+                interaction.commandName
             );
 
+
+            if(command){
+
+                await command.execute(
+                    interaction
+                );
+
+            }
+
         }
+
+
+
+
+        if(interaction.isButton()){
+
+
+            const button =
+            client.buttons.get(
+                interaction.customId
+            );
+
+
+            if(button){
+
+                await button.execute(
+                    interaction
+                );
+
+            }
+
+        }
+
+
+
+
+        if(interaction.isModalSubmit()){
+
+
+            const modal =
+            client.modals.get(
+                interaction.customId
+            );
+
+
+            if(modal){
+
+                await modal.execute(
+                    interaction
+                );
+
+            }
+
+        }
+
+
+
+    }
+
+    catch(error){
+
+        console.error(error);
 
     }
 
 
 });
-
 
 
 
