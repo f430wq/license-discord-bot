@@ -1,14 +1,36 @@
+const {
+    SlashCommandBuilder
+} = require("discord.js");
+
 const axios = require("axios");
 
 const config = require("../config");
 const checkAdmin = require("../utils/checkAdmin");
 
 
-
 module.exports = {
 
 
-    name:"deletekey",
+    data:
+
+    new SlashCommandBuilder()
+
+    .setName("deletekey")
+
+    .setDescription("Delete a license")
+
+    .addStringOption(option =>
+
+        option
+
+        .setName("key")
+
+        .setDescription("License key")
+
+        .setRequired(true)
+
+    ),
+
 
 
 
@@ -20,41 +42,19 @@ module.exports = {
 
             return interaction.reply({
 
-                content:
-                "❌ You don't have permission.",
+                content:"❌ No permission.",
 
                 ephemeral:true
 
             });
 
         }
-
 
 
 
 
         const key =
-        interaction.options.getString(
-            "key"
-        );
-
-
-
-
-        if(!key){
-
-
-            return interaction.reply({
-
-                content:
-                "❌ Missing license key.",
-
-                ephemeral:true
-
-            });
-
-        }
-
+        interaction.options.getString("key");
 
 
 
@@ -89,28 +89,15 @@ module.exports = {
 
 
 
-
-            if(!response.data.success){
-
-
-                return interaction.reply({
-
-                    content:
-                    `❌ ${response.data.message}`,
-
-                    ephemeral:true
-
-                });
-
-            }
-
-
-
-
             await interaction.reply({
 
                 content:
-                `🗑️ License deleted:\n\`${key}\``,
+
+                response.data.success
+
+                ? `🗑️ Deleted \`${key}\``
+
+                : `❌ ${response.data.message}`,
 
                 ephemeral:true
 
@@ -119,18 +106,16 @@ module.exports = {
 
 
         }
-
 
         catch(error){
 
 
-            console.error(error);
+            console.log(error);
 
 
             await interaction.reply({
 
-                content:
-                "❌ API error.",
+                content:"❌ API error.",
 
                 ephemeral:true
 
@@ -138,7 +123,6 @@ module.exports = {
 
 
         }
-
 
 
     }
